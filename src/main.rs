@@ -21,7 +21,7 @@ fn main() {
     // the list of objects with those two
     let mut actors = vec![player, npc];
     let tcod = screen::Tcod::new();
-    let map = map::make_map(&mut actors);
+    let map = map::Map::new(&mut actors);
     let mut game = game::Game::new(tcod, map, actors);
 
     game.run();

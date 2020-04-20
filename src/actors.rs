@@ -1,4 +1,5 @@
 use tcod::{BackgroundFlag, Color, Console};
+
 use crate::map;
 
 /// This is a generic object: the player, a monster, an item, the stairs...
@@ -23,7 +24,7 @@ impl Actor {
 
     /// move by the given amount
     pub fn move_by(&mut self, dx: i32, dy: i32, map: &map::Map) {
-        if !map[(self.x + dx) as usize][(self.y + dy) as usize].impassable {
+        if map.is_passable(self.x + dx, self.y + dy) {
             self.x += dx;
             self.y += dy;
         }

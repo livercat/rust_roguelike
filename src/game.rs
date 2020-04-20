@@ -26,7 +26,7 @@ impl Game {
         // go through all tiles, and set their background color
         for y in 0..config::MAP_HEIGHT {
             for x in 0..config::MAP_WIDTH {
-                let wall = self.map[x as usize][y as usize].block_sight;
+                let wall = self.map.blocks_sight(x, y);
                 if wall {
                     self.tcod.con
                         .set_char_background(x, y, map::COLOR_DARK_WALL, BackgroundFlag::Set);
