@@ -1,9 +1,6 @@
 use tcod::colors;
 
-use roguelike::actors;
-use roguelike::game;
-use roguelike::map;
-use roguelike::screen;
+use roguelike::{actors, game, map, screen};
 
 fn main() {
     // create object representing the player
@@ -19,7 +16,7 @@ fn main() {
         '@', colors::YELLOW);
 
     // the list of objects with those two
-    let mut actors = vec![player, npc];
+    let mut actors = actors::Actors{player, npcs: vec![npc]};
     let tcod = screen::Tcod::new();
     let map = map::Map::new(&mut actors);
     let mut game = game::Game::new(tcod, map, actors);

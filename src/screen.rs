@@ -1,11 +1,13 @@
 use tcod::{FontLayout, FontType};
 use tcod::console;
+use tcod::map::Map as FovMap;
 
-use crate::config;
+use crate::config::{MAP_HEIGHT, MAP_WIDTH};
 
 pub struct Tcod {
     pub root: console::Root,
     pub con: console::Offscreen,
+    pub fov: FovMap,
 }
 
 impl Tcod {
@@ -13,12 +15,15 @@ impl Tcod {
         let root = console::Root::initializer()
             .font("arial10x10.png", FontLayout::Tcod)
             .font_type(FontType::Greyscale)
-            .size(config::MAP_WIDTH, config::MAP_WIDTH)
+            .size(MAP_WIDTH, MAP_WIDTH)
             .title("Rust/libtcod tutorial")
             .init();
-        let con = console::Offscreen::new(config::MAP_WIDTH, config::MAP_HEIGHT);
 
-        Tcod { root, con }
+        Tcod {
+            root,
+            con: console::Offscreen::new(MAP_WIDTH, MAP_HEIGHT),
+            fov: FovMap::new(MAP_WIDTH, MAP_HEIGHT),
+        }
     }
 }
 

@@ -2,17 +2,9 @@ use std::cmp;
 use std::ops::Range;
 
 use rand::Rng;
-use tcod::Color;
 
 use crate::actors;
 use crate::config::{MAP_HEIGHT, MAP_WIDTH, MAX_ROOMS, ROOM_MAX_SIZE, ROOM_MIN_SIZE};
-
-pub const COLOR_DARK_WALL: Color = Color { r: 0, g: 0, b: 100 };
-pub const COLOR_DARK_GROUND: Color = Color {
-    r: 50,
-    g: 50,
-    b: 150,
-};
 
 #[derive(Clone, Debug)]
 pub struct Map {
@@ -25,12 +17,14 @@ pub struct Map {
 pub struct Tile {
     pub impassable: bool,
     pub block_sight: bool,
+    pub explored: bool,
 }
 
 impl Tile {
     pub fn empty() -> Self {
         Tile {
             impassable: false,
+            explored: false,
             block_sight: false,
         }
     }
@@ -38,6 +32,7 @@ impl Tile {
     pub fn wall() -> Self {
         Tile {
             impassable: true,
+            explored: false,
             block_sight: true,
         }
     }
@@ -129,17 +124,26 @@ impl Map {
         self.map[x as usize][y as usize].block_sight
     }
 
-    pub fn new(npc_vec: &mut Vec<actors::Actor>) -> Map {
+    pub fn explored(&self, x: i32, y: i32) -> bool {
+        self.map[x as usize][y as usize].explored
+    }
+
+    pub fn explore(&mut self, x: i32, y: i32) -> () {
+        self.map[x as usize][y as usize].explored = true;
+    }
+
+    pub fn new(actors: &mut actors::Actors) -> Map {
         let mut map = Map {
             map: vec![vec![Tile::wall(); MAP_HEIGHT as usize]; MAP_WIDTH as usize],
             rooms: vec![],
         };
-        map.fill(npc_vec);
+        map.fill(actors);
         map
     }
 
-    pub fn fill(&mut self, npc_vec: &mut Vec<actors::Actor>) {
-        let mut npc_iter = npc_vec.iter_mut();
+    pub fn fill(&mut self, actors: &mut actors::Actors) {
+        let mut npc_iter = actors.npcs.iter_mut();
+        let mut player_placed = false;
 
         for _ in 0..MAX_ROOMS {
             // random width and height
@@ -163,8 +167,13 @@ impl Map {
             // "paint" it to the map's tiles
             self.create_room(new_room);
             let (new_x, new_y) = new_room.center();
-            if let Some(next_npc) = npc_iter.next() {
-                next_npc.set_coords(new_x, new_y);
+            if player_placed {
+                if let Some(next_npc) = npc_iter.next() {
+                    next_npc.set_coords(new_x, new_y);
+                }
+            } else {
+                actors.player.set_coords(new_x, new_y);
+                player_placed = true;
             }
 
             self.rooms.push(new_room);

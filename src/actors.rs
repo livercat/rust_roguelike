@@ -1,4 +1,4 @@
-use tcod::{BackgroundFlag, Color, Console};
+use tcod::{Color};
 
 use crate::map;
 
@@ -12,9 +12,30 @@ pub struct Actor {
     color: Color,
 }
 
+pub struct Actors {
+    pub player: Actor,
+    pub npcs: Vec<Actor>,
+}
+
 impl Actor {
     pub fn new(x: i32, y: i32, char: char, color: Color) -> Self {
         Actor { x, y, char, color }
+    }
+
+    pub fn x(&self) -> i32 {
+        self.x
+    }
+
+    pub fn y(&self) -> i32 {
+        self.y
+    }
+
+    pub fn char(&self) -> char {
+        self.char
+    }
+
+    pub fn color(&self) -> Color {
+        self.color
     }
 
     pub fn set_coords(&mut self, x: i32, y: i32) -> () {
@@ -28,11 +49,5 @@ impl Actor {
             self.x += dx;
             self.y += dy;
         }
-    }
-
-    /// set the color and then draw the character that represents this object at its position
-    pub fn draw(&self, con: &mut dyn Console) {
-        con.set_default_foreground(self.color);
-        con.put_char(self.x, self.y, self.char, BackgroundFlag::None);
     }
 }
